@@ -41,6 +41,7 @@ Merge ERP sales data with CRM customer data.
 Use common keys (e.g., customer_id, product_id) to join datasets.
 Store final data in a star schema model (Gold Layer).
 
-#### Scope
-Transformations: Aggregations, standardizations, and calculations to ensure data readiness.
+
+### SQL Server Tables and Views structure
+![*Tables and Views structure*](./images/sql_server_sc.png "Tables and Views structure")
 

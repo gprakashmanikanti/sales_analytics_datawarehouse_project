@@ -45,3 +45,11 @@ Store final data in a star schema model (Gold Layer).
 ### SQL Server Tables and Views structure
 ![*Tables and Views structure*](./images/sql_server_sc.png "Tables and Views structure")
 
+### Analytical queries
+##### 1. Monthly Sales Trend
+
+![*Monthly Sales Trend*](./images/Analytical_query_1.png "Monthly Sales Trend")
+
+##### 2. Year-over-Year Growth in Sales
+
+![*Year-over-Year Growth in Sales*](./images/Analytical_Query_2.png "Year-over-Year Growth in Sales")

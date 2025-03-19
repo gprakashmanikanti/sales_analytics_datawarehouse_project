@@ -31,6 +31,12 @@ BEGIN
 		PRINT 'Loading CRM Tables';
 		PRINT '------------------------------------------------';
 
+--   trimming & Standardization: Removes leading/trailing spaces from cst_firstname, cst_lastname.
+--   Marital Status Mapping: Converts S → Single, M → Married, others → 'n/a'.
+--   Gender Mapping: Converts F → Female, M → Male, others → 'n/a'.
+--   Deduplication: Uses ROW_NUMBER() to select the most recent record per customer (cst_id).
+--   Data Integrity: Ensures cst_id is not NULL before processing.
+
 		-- Loading silver.crm_cust_info
         SET @start_time = GETDATE();
 		PRINT '>> Truncating Table: silver.crm_cust_info';
@@ -73,6 +79,16 @@ BEGIN
         PRINT '>> Load Duration: ' + CAST(DATEDIFF(SECOND, @start_time, @end_time) AS NVARCHAR) + ' seconds';
         PRINT '>> -------------';
 
+
+
+-- Category ID Extraction: Extracts first 5 characters from prd_key and replaces - with _.
+-- Product Key Extraction: Extracts the remaining portion of prd_key after position 7.
+-- Standardization: Maps product line codes (M → Mountain, R → Road, S → Other Sales, T → Touring, others → 'n/a').
+-- Cost Handling: Replaces NULL product costs with 0.
+-- Date Handling:mConverts prd_start_dt to DATE format.
+-- Computes prd_end_dt as one day before the next start date using LEAD().
+
+
 		-- Loading silver.crm_prd_info
         SET @start_time = GETDATE();
 		PRINT '>> Truncating Table: silver.crm_prd_info';
@@ -110,6 +126,16 @@ BEGIN
         SET @end_time = GETDATE();
         PRINT '>> Load Duration: ' + CAST(DATEDIFF(SECOND, @start_time, @end_time) AS NVARCHAR) + ' seconds';
         PRINT '>> -------------';
+
+
+
+--Transformations:
+
+-- Date Cleansing: Converts sls_order_dt, sls_ship_dt, and sls_due_dt to proper DATE format.
+-- Sets NULL for invalid dates (e.g., 0 or incorrect lengths).
+-- Sales Calculation: If sls_sales is missing, zero, or incorrect, it is recalculated as sls_quantity * ABS(sls_price).
+-- Price Correction:
+-- If sls_price is missing or non-positive, it is derived as sls_sales / NULLIF(sls_quantity, 0).
 
         -- Loading crm_sales_details
         SET @start_time = GETDATE();
@@ -159,6 +185,13 @@ BEGIN
         PRINT '>> Load Duration: ' + CAST(DATEDIFF(SECOND, @start_time, @end_time) AS NVARCHAR) + ' seconds';
         PRINT '>> -------------';
 
+
+--Transformations:
+-- Customer ID Standardization: Removes the 'NAS' prefix if present in cid.
+-- Birthdate Validation: If bdate is in the future, it is set to NULL.
+-- Gender Normalization:
+-- Converts variations (F, FEMALE → 'Female', M, MALE → 'Male', others → 'n/a').
+
         -- Loading erp_cust_az12
         SET @start_time = GETDATE();
 		PRINT '>> Truncating Table: silver.erp_cust_az12';
@@ -192,6 +225,11 @@ BEGIN
 		PRINT 'Loading ERP Tables';
 		PRINT '------------------------------------------------';
 
+
+-- Transformations:
+-- Customer ID Cleanup: Removes dashes (-) from cid.
+-- Country Code Normalization: Maps DE → Germany, US or USA → United States, blank values → 'n/a'.
+
         -- Loading erp_loc_a101
         SET @start_time = GETDATE();
 		PRINT '>> Truncating Table: silver.erp_loc_a101';
@@ -214,6 +252,9 @@ BEGIN
         PRINT '>> Load Duration: ' + CAST(DATEDIFF(SECOND, @start_time, @end_time) AS NVARCHAR) + ' seconds';
         PRINT '>> -------------';
 		
+
+-- Transformations: Direct Mapping: Loads id, cat, subcat, and maintenance as-is from the Bronze table.
+
 		-- Loading erp_px_cat_g1v2
 		SET @start_time = GETDATE();
 		PRINT '>> Truncating Table: silver.erp_px_cat_g1v2';

@@ -36,7 +36,7 @@ Ensure data consistency between ERP & CRM.
 
 #### Integration
 
-![*data_integration*](./images/schema.png "data_integration")
+![*data_integration*](./images/schema.png "data_integratios")
 Merge ERP sales data with CRM customer data.
 Use common keys (e.g., customer_id, product_id) to join datasets.
 Store final data in a star schema model (Gold Layer).
